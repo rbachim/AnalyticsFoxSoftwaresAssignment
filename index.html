@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Assignment</title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--<link rel="stylesheet" type="text/css" href="main.css">-->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<style>
+			#UserShow{
+				float : right;
+			}
+			.user_bdy
+			{
+			   visibility: hidden;
+			}
+			.UserSelect{
+				display:block;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+		<script>
+			$(document).ready(function(){
+			    //GET DATA BY AJAX CALL
+				$.ajax({
+					url : 'https://jsonplaceholder.typicode.com/users',
+					type : 'GET',
+					dataType:'json',
+					success : function(data) {              
+					    var Userdata="";
+						for(var i=0;i<data.length;i++){
+							Userdata += "<tr><td><input type='checkbox' id="+data[i].id+" name='record'></td><td>" + data[i].name + "</td><td>" + data[i].username + "</td><td>" + data[i].email + "</td><td class='UserSelect btn btn-primary' type='button' id="+data[i].id+">i</td></tr>";
+						}
+						$("table tbody").append(Userdata);
+						$(".user_bdy").css("visibility","visible");
+					},
+					error : function(request,error)
+					{
+						alert("Request: "+JSON.stringify(request));
+					}
+				});
+				
+				
+				
+				// SELECT ALL FUNCTION
+				$('#selectAll').click(function (e) {
+					$(this).closest('table').find('td input:checkbox').prop('checked', this.checked);
+				});
+				
+				// SELECT PARTICULAR USER
+				$("#UserTable").on("click", "td.UserSelect", function() {
+					UserId = $(this).attr('id');
+					//console.log(UserId);
+					$.ajax({
+						url : 'https://jsonplaceholder.typicode.com/users/'+UserId,
+						type : 'GET',
+						dataType:'json',
+						success : function(data) {              
+							console.log(data);
+							$("#myModalregister").modal("show");
+							$('input[type="text"][class="GetName"]').prop("value", data.name); 
+							$('input[type="text"][class="GetUserName"]').prop("value", data.username);
+							$('input[type="text"][class="GetEmail"]').prop("value", data.email);
+							$('input[type="text"][class="GetPhone"]').prop("value", data.phone);
+							$('input[type="text"][class="GetWebsite"]').prop("value", data.website); 
+						},
+						error : function(request,error)
+						{
+							alert("Request: "+JSON.stringify(request));
+						}
+					});
+				});
+				
+				var getChecked = function() {
+					return $('#UserTable').find('input[type="checkbox"]')
+									  .filter(':checked')
+									  .toArray()
+									  .map(function(x) {
+										 return $(x).attr('id');
+									  });
+				}
+				
+				//SHOW SELECTED USER
+				$('#UserShow').click(function (e) {
+					console.log(getChecked());
+				});
+				
+				//SEARH FUNCTION
+				function filterTable(event) {
+				var filter = event.target.value.toUpperCase();
+				var rows = document.querySelector("#UserTable tbody").rows;
+				
+				for (var i = 0; i < rows.length; i++) {
+					var firstCol = rows[i].cells[0].textContent.toUpperCase();
+					var secondCol = rows[i].cells[1].textContent.toUpperCase();
+					var thirdCol = rows[i].cells[2].textContent.toUpperCase();
+					var fourthCol = rows[i].cells[3].textContent.toUpperCase();
+					if (firstCol.indexOf(filter) > -1 || secondCol.indexOf(filter) > -1 || thirdCol.indexOf(filter) > -1 || fourthCol.indexOf(filter) > -1) {
+						rows[i].style.display = "";
+					} else {
+						rows[i].style.display = "none";
+					}      
+				}
+			}
+
+			document.querySelector('#FilterText').addEventListener('keyup', filterTable, false);
+			});    
+		</script>
+	</head>
+	<body >
+	    <div class="user_bdy">
+			<div>
+				<h2><center>User Information</center></h2>
+			</div>
+			<div class="user_table col-sm-12 col-md-12 col-lg-12 table-responsive">
+				<div class="col-sm-12 col-xs-12 col-lg-6 col-md-6">
+					<input type="text" class="form-control" placeholder="search" id="FilterText"><br>
+				</div>
+				<table id="UserTable" class="table table-bordered ">
+					<thead>
+						<tr>
+							<th>
+								<input type="checkbox" id="selectAll" />
+							</th>
+							<th>Name</th>
+							<th>User Name</th>
+							<th>Email</th>
+							<th>Info Button</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+				<button class="btn btn-success btn-sm" id="UserShow">Save</button>
+			</div>
+			
+			<!-- MODAL  -->
+			<div class="modal" id="myModalregister" role="dialog">
+				<div class="modal-dialog" >
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title"><center>User Information</center></h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						<div class="modal-body">
+								<div class="col-xs-12 col-md-6 col-lg-6 col-sm-6">
+									<label>Name</label>
+									<input type="text" class="GetName" disabled><br>
+									<label>User Name</label>
+									<input type="text" class="GetUserName" disabled><br>
+								</div>
+							
+								<div class="col-xs-12 col-md-6 col-lg-6 col-sm-6">
+									<label>Email</label>
+									<input type="text" class="GetEmail" disabled><br>
+								</div>
+							
+								<div class="col-xs-12 col-md-6 col-lg-6 col-sm-6">
+									<label>Phone</label>
+									<input type="text" class="GetPhone" disabled> <br>
+								</div>
+							
+								<div class="col-xs-12 col-md-6 col-lg-6 col-sm-6">
+									<label>Website</label>
+									<input type="text" class="GetWebsite" disabled>
+								</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
