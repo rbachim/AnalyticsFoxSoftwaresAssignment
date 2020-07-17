@@ -60,7 +60,7 @@
 						type : 'GET',
 						dataType:'json',
 						success : function(data) {              
-							console.log(data);
+							//console.log(data);
 							$("#myModalregister").modal("show");
 							$('input[type="text"][class="GetName"]').prop("value", data.name); 
 							$('input[type="text"][class="GetUserName"]').prop("value", data.username);
